@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Controllers\IzinController;
 
 // === Login routes ===
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -33,6 +34,10 @@ Route::middleware(['auth'])->group(function () {
     })->middleware([RoleMiddleware::class . ':karyawan'])->name('karyawan.dashboard');
 
     // Contoh route dummy untuk menu di dashboard
-    Route::get('/izin/ajukan', fn() => 'Form Ajukan Izin')->name('izin.create');
+   Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':karyawan'])->group(function () {
+    Route::get('/izin/ajukan', [IzinController::class, 'create'])->name('izin.create');
+    Route::post('/izin/ajukan', [IzinController::class, 'store'])->name('izin.store');
+    Route::get('/izin/sukses/{izin}', [IzinController::class, 'success'])->name('izin.sukses'); // opsional
+});
     Route::get('/absensi/riwayat', fn() => 'Riwayat Absensi')->name('absensi.riwayat');
 });

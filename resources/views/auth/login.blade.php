@@ -8,7 +8,7 @@
 
   <div class="right">
     <div class="card">
-      <h1 class="title">Welcome Back</h1>
+      <h1 class="title">Selamat Datang</h1>
 
       @if ($errors->any())
         <div class="error">
