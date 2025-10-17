@@ -61,6 +61,7 @@
     }
   </style>
   @stack('head')
+  @stack('styles')
 </head>
 <body>
   @yield('content')
