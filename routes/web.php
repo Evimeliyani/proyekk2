@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\IzinController;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\KaryawanController;
 
 // === Login routes ===
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -11,12 +14,31 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // === Routes dengan proteksi auth ===
-Route::middleware(['auth'])->group(function () {
-    // Admin dashboard
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->middleware([RoleMiddleware::class . ':admin'])->name('admin.dashboard');
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin'])
+    ->group(function () {
+        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('admin.dashboard');
 
+    // Menu admin lain (sementara pakai view sederhana/placeholder agar tidak error)
+        Route::get('/admin/karyawan', [KaryawanController::class,'index'])->name('admin.karyawan.index');
+        Route::get('/admin/karyawan/tambah', [KaryawanController::class,'create'])->name('admin.karyawan.create');
+        Route::post('/admin/karyawan',       [KaryawanController::class,'store'])->name('admin.karyawan.store');
+        Route::get('/admin/karyawan/{user}/edit', [KaryawanController::class,'edit'])->name('admin.karyawan.edit');
+        Route::put('/admin/karyawan/{user}',      [KaryawanController::class,'update'])->name('admin.karyawan.update');
+        Route::delete('/admin/karyawan/{user}',   [KaryawanController::class,'destroy'])->name('admin.karyawan.destroy');
+
+        Route::view('/admin/presensi', 'admin.presensi.index')->name('admin.presensi.index');
+        Route::view('/admin/laporan',  'admin.laporan.index')->name('admin.laporan.index');
+
+        // Persetujuan izin (daftar + approve/reject)
+        Route::get('/admin/izin', [IzinController::class, 'index'])->name('izin.index');
+        Route::post('/admin/izin/{izin}/approve', [IzinController::class, 'approve'])->name('izin.approve');
+        Route::post('/admin/izin/{izin}/reject',  [IzinController::class, 'reject'])->name('izin.reject');
+        
+    });
+
+
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':karyawan'])->group(function () {
     // Karyawan dashboard
     Route::get('/karyawan/dashboard', function () {
         // di sini kamu bisa lempar data ke view dashboard
@@ -34,10 +56,12 @@ Route::middleware(['auth'])->group(function () {
     })->middleware([RoleMiddleware::class . ':karyawan'])->name('karyawan.dashboard');
 
     // Contoh route dummy untuk menu di dashboard
-   Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':karyawan'])->group(function () {
+  
     Route::get('/izin/ajukan', [IzinController::class, 'create'])->name('izin.create');
     Route::post('/izin/ajukan', [IzinController::class, 'store'])->name('izin.store');
     Route::get('/izin/sukses/{izin}', [IzinController::class, 'success'])->name('izin.sukses'); // opsional
-});
-    Route::get('/absensi/riwayat', fn() => 'Riwayat Absensi')->name('absensi.riwayat');
+
+    Route::get('/absensi/riwayat', [AbsensiController::class, 'index'])
+    ->middleware([\App\Http\Middleware\RoleMiddleware::class . ':karyawan'])
+    ->name('absensi.riwayat');
 });
