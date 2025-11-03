@@ -7,12 +7,26 @@
     --bg:#deeae2; --panel:#e9f0ea; --header:#8fb3bb; --ink:#2a4d52;
     --hadir:#25c23a; --alfa:#ff3b30; --izin:#f6e05e; --terlambat:#f59e0b;
   }
+
+  /* biar aman melebar */
+  html,body{margin:0;padding:0;overflow-x:hidden;background:var(--panel)}
+
+  /* === kunci full width keluar dari container layout === */
+  .full-bleed{
+    width:100vw;
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
+  }
+
   /* Shell */
   .r-wrap{min-height:100dvh;background:var(--panel);padding:0}
   .r-shell{width:100%;max-width:100%}
 
   /* Header bar */
-  .r-header{background:var(--header);color:#0a2a30;padding:14px 16px;display:flex;align-items:center;gap:10px}
+  .r-header{
+    background:var(--header);color:#0a2a30;padding:14px 24px;
+    display:flex;align-items:center;gap:10px
+  }
   .r-back{background:#2a4d52;color:#fff;padding:6px 10px;border-radius:8px;text-decoration:none}
   .r-avatar{width:40px;height:40px;border-radius:50%;background:#d7d7d7}
   .r-info .name{font-weight:700;line-height:1}
@@ -20,14 +34,19 @@
   .r-period{margin-left:auto;font-weight:600}
 
   /* Body */
-  .r-body{background:var(--bg);padding:16px}
+  .r-body{background:var(--bg);padding:20px 24px}
   .filters{display:flex;gap:6px;margin:10px 0}
   .sel{border:1px solid #c9d2cc;border-radius:8px;padding:6px 8px;background:#fff}
   .btn{background:#2a4d52;color:#fff;border:none;border-radius:8px;padding:6px 10px;cursor:pointer}
 
   /* Table */
-  table.absensi{width:100%;border-collapse:collapse;background:#fff; box-shadow:0 6px 14px rgba(0,0,0,.08)}
-  table.absensi th, table.absensi td{padding:10px 12px;border:1px solid #e6e6e6;font-size:13px;text-align:center}
+  table.absensi{
+    width:100%;border-collapse:collapse;background:#fff;
+    box-shadow:0 6px 14px rgba(0,0,0,.08)
+  }
+  table.absensi th, table.absensi td{
+    padding:10px 12px;border:1px solid #e6e6e6;font-size:13px;text-align:center
+  }
   table.absensi th{background:#f5f5f5;color:#2f3d40;font-weight:600}
 
   /* Status dots */
@@ -36,11 +55,16 @@
   .izin{background:var(--izin)} .terlambat{background:var(--terlambat)}
   .legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:8px 0 12px;font-size:12px;color:#213b40}
   .legend span{display:flex;align-items:center;gap:6px}
+
+  @media(max-width:900px){
+    .r-header{padding:12px 16px}
+    .r-body{padding:16px}
+  }
 </style>
 @endpush
 
 @section('content')
-<div class="r-wrap">
+<div class="r-wrap full-bleed">
   <div class="r-shell">
 
     {{-- HEADER --}}

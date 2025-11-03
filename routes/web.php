@@ -7,6 +7,7 @@ use App\Http\Controllers\IzinController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\KaryawanController;
+use App\Http\Controllers\Admin\PresensiController;
 
 // === Login routes ===
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -27,7 +28,9 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin'
         Route::put('/admin/karyawan/{user}',      [KaryawanController::class,'update'])->name('admin.karyawan.update');
         Route::delete('/admin/karyawan/{user}',   [KaryawanController::class,'destroy'])->name('admin.karyawan.destroy');
 
-        Route::view('/admin/presensi', 'admin.presensi.index')->name('admin.presensi.index');
+        Route::get('/admin/presensi', [PresensiController::class, 'index'])->name('admin.presensi.index');
+        Route::get('/admin/presensi/cetak', [PresensiController::class, 'cetak'])->name('admin.presensi.cetak');
+        
         Route::view('/admin/laporan',  'admin.laporan.index')->name('admin.laporan.index');
 
         // Persetujuan izin (daftar + approve/reject)
