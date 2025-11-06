@@ -8,6 +8,7 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\PresensiController;
+use App\Http\Controllers\Admin\LaporanController;
 
 // === Login routes ===
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -31,7 +32,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin'
         Route::get('/admin/presensi', [PresensiController::class, 'index'])->name('admin.presensi.index');
         Route::get('/admin/presensi/cetak', [PresensiController::class, 'cetak'])->name('admin.presensi.cetak');
         
-        Route::view('/admin/laporan',  'admin.laporan.index')->name('admin.laporan.index');
+        Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+
 
         // Persetujuan izin (daftar + approve/reject)
         Route::get('/admin/izin', [IzinController::class, 'index'])->name('izin.index');
