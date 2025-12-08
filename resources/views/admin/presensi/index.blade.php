@@ -112,7 +112,7 @@
     </div>
 
     <div class="table-wrap">
-      <table>
+      <table id="tabel-presensi">
         <thead>
           <tr>
             <th style="width:150px">UID</th>
@@ -173,3 +173,26 @@
   </div>
 </div>
 @endsection
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+function cekRFID() {
+    $.ajax({
+        url: "http://proyekk2.test/scan-presensi",  // ← PAKE HTTP!
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+
+            if (data.uid) console.log("SCAN:", data);
+
+            if (!data || !data.uid) return;
+
+            // Kalau UID masuk → reload tabel
+            $("#tabel-presensi").load(location.href + " #tabel-presensi > *");
+        }
+    });
+}
+
+setInterval(cekRFID, 300); // 0.3 detik
+</script>

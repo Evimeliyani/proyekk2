@@ -158,4 +158,27 @@
     </div>
   </div>
 </div>
+<script>
+function autoAbsen() {
+    fetch("{{ route('absensi.proses') }}")
+        .then(response => response.text())
+        .then(text => {
+
+            console.log("RESPON:", text);
+
+            // Jika backend mengirim string biasa
+            if (text.includes("Absen berhasil")) {
+                alert(text);
+
+                // reload setelah 1.5 detik
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        })
+        .catch(err => console.error("ERR:", err));
+}
+
+setInterval(autoAbsen, 3000); // cek tiap 3 detik
+</script>
 @endsection

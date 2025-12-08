@@ -70,3 +70,18 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':karyaw
     ->middleware([\App\Http\Middleware\RoleMiddleware::class . ':karyawan'])
     ->name('absensi.riwayat');
 });
+
+    // ==============================
+// ROUTE UNTUK AMBIL UID DARI ESP32
+// ==============================
+
+Route::get('/scan-presensi', [PresensiController::class, 'scanRealtime'])
+     ->name('scan.presensi');
+
+
+// ==============================
+// ROUTE UNTUK PROSES ABSENSI
+// ==============================
+Route::get('/absensi/proses', [AbsensiController::class, 'proses'])
+     ->name('absensi.proses');
+
