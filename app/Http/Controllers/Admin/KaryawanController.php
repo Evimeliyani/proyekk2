@@ -62,30 +62,50 @@ public function update(Request $r, User $user)
     abort_unless($user->role === 'karyawan', 404);
 
     $data = $r->validate([
-        'uid'     => ['required','string','max:50', Rule::unique('karyawans','uid')->ignore($user->karyawan->id ?? null)],
-        'name'    => ['required','string','max:100'],
-        'email'   => ['required','email','max:150', Rule::unique('users','email')->ignore($user->id)],
-        'password'=> ['nullable','string','min:6'], // kosongkan jika tidak ganti
-        'alamat'  => ['nullable','string','max:255'],
-        'status'  => ['required', Rule::in(['aktif','cuti','nonaktif'])],
+        'uid' => [
+            'required',
+            'string',
+            'max:50',
+            // cek unik di users (kecuali user ini)
+            Rule::unique('users', 'uid')->ignore($user->id),
+            // cek unik di karyawans (kecuali karyawan ini)
+            Rule::unique('karyawans', 'uid')->ignore($user->karyawan->id ?? null),
+        ],
+        'name'     => ['required','string','max:100'],
+        'email'    => ['required','email','max:150', Rule::unique('users','email')->ignore($user->id)],
+        'password' => ['nullable','string','min:6'],
+        'alamat'   => ['nullable','string','max:255'],
+        'status'   => ['required', Rule::in(['aktif','cuti','nonaktif'])],
     ]);
 
-    // update users
-    $user->name  = $data['name'];
-    $user->email = $data['email'];
-    if (!empty($data['password'])) {
-        $user->password = Hash::make($data['password']);
-    }
-    $user->save();
+    // UPDATE USERS
+    $user->update([
+        'name'  => $data['name'],
+        'email' => $data['email'],
+        'uid'   => $data['uid'], // ⬅️ INI WAJIB
+    ]);
 
-    // update/insert profil karyawan
+    if (!empty($data['password'])) {
+        $user->update([
+            'password' => Hash::make($data['password']),
+        ]);
+    }
+
+    // UPDATE / CREATE KARYAWAN
     $user->karyawan()->updateOrCreate(
         ['user_id' => $user->id],
-        ['uid' => $data['uid'], 'alamat' => $data['alamat'] ?? null, 'status' => $data['status']]
+        [
+            'uid'    => $data['uid'],
+            'alamat' => $data['alamat'] ?? null,
+            'status' => $data['status'],
+        ]
     );
 
-    return redirect()->route('admin.karyawan.index')->with('ok','Data karyawan diperbarui.');
+    return redirect()
+        ->route('admin.karyawan.index')
+        ->with('ok', 'Data karyawan diperbarui.');
 }
+
 
 // HAPUS DATA
 public function destroy(User $user)

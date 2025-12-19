@@ -86,8 +86,67 @@
   .legend{font-size:12px;color:#233b3f}
   .legend li{list-style:none;margin:2px 0}
   canvas{width:100%!important;height:320px!important}
+
+<style>
+.popup-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+
+  
+  /* 🔥 INI KUNCI UTAMANYA */
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+}
+
+.popup-box{
+  background:#f8efe8;
+  padding:24px;
+  border-radius:18px;
+  width:320px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,.2);
+  animation: pop .25s ease;
+}
+
+.popup-icon{
+  font-size:40px;
+  margin-bottom:8px;
+}
+
+.popup-box h4{
+  margin:6px 0;
+  color:#2a4d52;
+}
+
+.popup-box p{
+  font-size:14px;
+  color:#355e63;
+}
+
+.popup-box button{
+  margin-top:14px;
+  padding:8px 20px;
+  background:#2a4d52;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+@keyframes popup{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+</style>
+
 </style>
 @endpush
+
+
 
 @section('content')
 <div class="layout">
@@ -130,9 +189,28 @@
       <div class="grid grid-2" style="grid-template-columns:1.2fr 1fr">
         <div class="grid grid-3">
           <div class="card pill">📄 <b>{{ $izinPending }}</b> permohonan izin menunggu persetujuan</div>
-          <div class="card" style="height:160px;display:flex;align-items:center;justify-content:center;background:#f8efe8">
-            Tambahkan Informasi disini
-          </div>
+        <div class="card" style="background:#f8efe8">
+  <h4 style="margin-bottom:10px">📢 Tambahkan Informasi</h4>
+
+  <form onsubmit="return false;">
+  <textarea
+    id="infoText"
+    placeholder="Tulis informasi di sini..."
+    rows="3"
+    style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;resize:none"
+  ></textarea>
+
+  <button
+    type="button"
+    onclick="kirimInfo()"
+    style="margin-top:10px;padding:8px 14px;background:#2a4d52;color:#fff;border:none;border-radius:8px;cursor:pointer"
+  >
+    Kirim Informasi
+  </button>
+</form>
+
+</div>
+
         </div>
 
         <div class="card">
@@ -150,6 +228,16 @@
       </div>
     </div>
   </main>
+<!-- POPUP INFORMASI -->
+<div id="popup-info" class="popup-overlay">
+  <div class="popup-box">
+    <div class="popup-icon">🌿</div>
+    <h4>Berhasil</h4>
+    <p>Informasi berhasil dikirim</p>
+    <button onclick="closePopup()">OK</button>
+  </div>
+</div>
+  
 </div>
 @endsection
 
@@ -184,5 +272,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('barLegend').innerHTML =
     barLabels.map((l,i)=> `${i+1}. <b>${l}</b>: ${barValues[i] ?? 0}`).join(' &nbsp; ');
 });
+</script>
+<script>
+function kirimInfo(){
+  const textarea = document.getElementById('infoText');
+  if(!textarea) return;
+
+  const text = textarea.value.trim();
+  if(text === '') return;
+
+  document.getElementById('popup-info').style.display = 'flex';
+  textarea.value = '';
+}
+
+function closePopup(){
+  document.getElementById('popup-info').style.display = 'none';
+}
 </script>
 @endpush

@@ -105,7 +105,7 @@ class PresensiController extends Controller
     public function scanRealtime()
 {
     // IP ESP32 kamu
-    $esp32_ip = "http://10.0.175.16/rfid-scan";
+    $esp32_ip = "http://10.0.168.172/rfid-scan";
 
     try {
         $response = Http::timeout(2)->get($esp32_ip);
