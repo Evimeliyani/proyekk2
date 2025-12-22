@@ -1,4 +1,4 @@
-@extends('layouts.auth')
+@extends('layouts.admin')
 @section('title','Laporan')
 
 @push('styles')
@@ -7,8 +7,6 @@
     --bg:#deeae2; --panel:#e9f0ea; --header:#8fb3bb; --ink:#2a4d52;
   }
 
-  html,body{margin:0;padding:0;overflow-x:hidden;background:var(--panel)}
-  .full-bleed{width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
 
   .lap-wrap{min-height:100dvh;background:var(--panel);padding:0}
   .r-header{

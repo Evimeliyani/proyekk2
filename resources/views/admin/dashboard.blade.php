@@ -51,12 +51,13 @@
     box-shadow:0 1px 4px rgba(0,0,0,0.1);
   }
 
-  .content{
-    padding:28px 40px;  /* tambah padding biar rapi di layar besar */
-    max-width:1600px;   /* biar tidak kepanjangan di monitor super lebar */
-    margin:0 auto;
-    width:100%;
-  }
+.content{
+  padding:28px 32px;
+  max-width: 100%;
+  margin:0;
+  width:100%;
+}
+
 
   .card{
     background:var(--card);
@@ -67,9 +68,34 @@
     width:100%;
   }
 
-  .grid{display:grid;gap:16px;width:100%}
-  .grid-2{grid-template-columns:1fr 1fr}
-  .grid-3{grid-template-columns:1fr}
+/* ===== GRID UTAMA DASHBOARD ===== */
+.grid{
+  display:grid;
+  gap:20px;
+  width:100%;
+}
+
+/* baris atas: kiri + kanan */
+.grid-2{
+  display:grid;
+  grid-template-columns: 1.2fr 1fr; /* kiri lebih lebar */
+  gap:20px;
+  align-items:start; /* 🔥 penting biar sejajar */
+}
+
+/* kolom kiri (2 card ke bawah) */
+.grid-3{
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:16px;
+}
+
+/* card umum */
+.card{
+  width:100%;
+  box-sizing:border-box;
+}
+
 
   @media(min-width:980px){ .grid-3{grid-template-columns:1fr} }
   @media(min-width:1100px){ .grid-3{grid-template-columns:1fr} }
@@ -87,7 +113,7 @@
   .legend li{list-style:none;margin:2px 0}
   canvas{width:100%!important;height:320px!important}
 
-<style>
+
 .popup-overlay{
   position: fixed;
   inset: 0;
@@ -141,11 +167,57 @@
   from{transform:scale(.85);opacity:0}
   to{transform:scale(1);opacity:1}
 }
-</style>
+
+/* ===== RAPIN ISI CARD DASHBOARD ===== */
+
+/* card permohonan izin */
+.card.pill{
+  min-height:70px;
+  display:flex;
+  align-items:center;
+  font-size:15px;
+}
+
+/* card tambah informasi */
+.card textarea{
+  min-height:90px;
+}
+
+/* pie chart */
+#pieToday{
+  max-height:260px;
+  margin:auto;
+  display:block;
+}
+
+/* bar chart */
+#barMonth{
+  max-height:340px;
+}
+
+/* ===== RAPIN GRID DASHBOARD ===== */
+
+.grid-dashboard{
+  display:grid;
+  grid-template-columns: 1.2fr 1fr;
+  grid-auto-rows: min-content;
+  gap:16px;
+}
+
+/* kolom kiri */
+.grid-left{
+  display:grid;
+  gap:16px;
+}
+
+/* card kehadiran memanjang ke bawah */
+.card-kehadiran{
+  grid-row: span 2;
+}
+
 
 </style>
 @endpush
-
 
 
 @section('content')
@@ -180,7 +252,7 @@
           Logout
         </button>
       </form>
-    </div>
+    </div> 
 
     <div class="content">
       <h3 style="margin:6px 0 12px;color:#1f3c40">🛡️ Dashboard</h3>
@@ -213,12 +285,12 @@
 
         </div>
 
-        <div class="card">
-          <div style="font-weight:600;margin-bottom:8px">Kehadiran hari ini</div>
-          <canvas id="pieToday"></canvas>
-          <ul class="legend" id="pieLegend" style="margin-top:6px"></ul>
-        </div>
-      </div>
+<div class="card card-kehadiran">
+  <div style="font-weight:600;margin-bottom:8px">Kehadiran hari ini</div>
+  <canvas id="pieToday"></canvas>
+  <ul class="legend" id="pieLegend" style="margin-top:6px"></ul>
+</div>
+
 
       {{-- baris 2: bar chart --}}
       <div class="card" style="margin-top:16px">
@@ -228,6 +300,7 @@
       </div>
     </div>
   </main>
+  
 <!-- POPUP INFORMASI -->
 <div id="popup-info" class="popup-overlay">
   <div class="popup-box">
@@ -237,49 +310,83 @@
     <button onclick="closePopup()">OK</button>
   </div>
 </div>
-  
+
 </div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
 <script>
-const pieLabels = @json($pieLabels);
-const pieValues = @json($pieValues);
-const totalHariIni = @json($totalHariIni);
+/* =====================
+   DATA DARI CONTROLLER
+===================== */
+const pieLabels = @json($pieLabels ?? []);
+const pieValues = @json($pieValues ?? []);
+const totalHariIni = @json($totalHariIni ?? 0);
 
-const barLabels = @json($barLabels);
-const barValues = @json($barValues);
+const barLabels = @json($barLabels ?? []);
+const barValues = @json($barValues ?? []);
 
+/* =====================
+   CHART
+===================== */
 document.addEventListener('DOMContentLoaded', () => {
-  // PIE
-  const pctx = document.getElementById('pieToday').getContext('2d');
-  new Chart(pctx, {
-    type: 'pie',
-    data: { labels: pieLabels, datasets: [{ data: pieValues }] },
-    options: { responsive:true, plugins:{ legend:{ display:false } } }
-  });
-  const pct = totalHariIni ? pieValues.map(v => (v*100/totalHariIni).toFixed(1)) : pieValues.map(()=>0);
-  document.getElementById('pieLegend').innerHTML = pieLabels.map((l,i)=> `<li>${l}: <b>${pieValues[i]}</b> (${pct[i]}%)</li>`).join('');
 
-  // BAR
-  const bctx = document.getElementById('barMonth').getContext('2d');
-  new Chart(bctx, {
-    type: 'bar',
-    data: { labels: barLabels, datasets: [{ label:'Hadir', data: barValues, borderWidth:1 }] },
-    options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
-  });
-  document.getElementById('barLegend').innerHTML =
-    barLabels.map((l,i)=> `${i+1}. <b>${l}</b>: ${barValues[i] ?? 0}`).join(' &nbsp; ');
+  // PIE CHART
+  if (document.getElementById('pieToday')) {
+    const pctx = document.getElementById('pieToday').getContext('2d');
+    new Chart(pctx, {
+      type: 'pie',
+      data: {
+        labels: pieLabels,
+        datasets: [{ data: pieValues }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    const pct = totalHariIni
+      ? pieValues.map(v => (v * 100 / totalHariIni).toFixed(1))
+      : pieValues.map(() => 0);
+
+    document.getElementById('pieLegend').innerHTML =
+      pieLabels.map((l,i)=> `<li>${l}: <b>${pieValues[i]}</b> (${pct[i]}%)</li>`).join('');
+  }
+
+  // BAR CHART
+  if (document.getElementById('barMonth')) {
+    const bctx = document.getElementById('barMonth').getContext('2d');
+    new Chart(bctx, {
+      type: 'bar',
+      data: {
+        labels: barLabels,
+        datasets: [{
+          label: 'Hadir',
+          data: barValues,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    document.getElementById('barLegend').innerHTML =
+      barLabels.map((l,i)=> `${i+1}. <b>${l}</b>: ${barValues[i] ?? 0}`).join(' &nbsp; ');
+  }
 });
-</script>
-<script>
+
+/* =====================
+   POPUP
+===================== */
 function kirimInfo(){
   const textarea = document.getElementById('infoText');
-  if(!textarea) return;
-
-  const text = textarea.value.trim();
-  if(text === '') return;
+  if (!textarea || textarea.value.trim() === '') return;
 
   document.getElementById('popup-info').style.display = 'flex';
   textarea.value = '';
@@ -289,4 +396,5 @@ function closePopup(){
   document.getElementById('popup-info').style.display = 'none';
 }
 </script>
-@endpush
+
+
