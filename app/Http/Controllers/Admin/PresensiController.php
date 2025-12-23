@@ -143,7 +143,7 @@ class PresensiController extends Controller
     $jamMasuk = $now->format('H:i:s');
 
     // batas terlambat: 08:00 WIB
-    $batasTerlambat = Carbon::createFromTime(8, 0, 0, 'Asia/Jakarta');
+    $batasTerlambat = Carbon::createFromTime(14, 0, 0, 'Asia/Jakarta');
 
     if ($now->greaterThan($batasTerlambat)) {
         $status = 'terlambat';
